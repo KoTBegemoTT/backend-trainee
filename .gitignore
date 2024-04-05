@@ -1,0 +1,9 @@
+# Django #
+*.log
+*.pot
+*.pyc
+__pycache__
+/static
+banerApi/local_settings.py
+banerApi/production_settings.py
+
