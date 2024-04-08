@@ -1,8 +1,10 @@
+import json
+
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Banner
-from .serializers import BannerSerializer
+from .serializers import BannerSerializer, UserBannerQuerySerializer
 
 
 # Create your views here.
@@ -33,14 +35,23 @@ def banner_view(request):
 
 
 @api_view(["GET"])
-def get_banner(request, banner_id):
-    # Todo change this view on user_banner
+def get_banner(request):
     try:
-        banner = Banner.objects.get(banner_id=banner_id)
+        tag_id = int(request.query_params.get('tag_id'))
+        feature_id = int(request.query_params.get('feature_id'))
+        use_last_version = bool(request.query_params.get('use_last_revision', False))
+    except Exception as e:
+        return Response({"error": str(e)}, status=400)
+
+    # Todo add use_last_version
+    try:
+        banner = Banner.objects.filter(feature_id=feature_id).get(tag_ids=tag_id)
         serializer = BannerSerializer(banner)
-        return Response(serializer.data)
     except Banner.DoesNotExist:
-        return Response("Banner not found", status=404)
+        return Response(status=404)
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
+    return Response(serializer.data)
 
 
 @api_view(["PATCH", 'DELETE'])

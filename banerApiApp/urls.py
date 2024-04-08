@@ -5,4 +5,5 @@ urlpatterns = [
     path('', views.index),
     path('banner', views.banner_view),
     path('banner/<int:banner_id>', views.update_banner),
+    path('user_banner', views.get_banner),
 ]
