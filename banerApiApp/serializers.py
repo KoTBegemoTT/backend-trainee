@@ -9,11 +9,7 @@ class BannerSerializer(ModelSerializer):
         fields = '__all__'
 
 
-class UserBannerQuerySerializer(ModelSerializer):
-    feature_id = rest_framework.serializers.IntegerField()
-    tag_id = rest_framework.serializers.IntegerField()
-    use_last_revision = rest_framework.serializers.BooleanField(required=False)
-
+class UserBannerSerializer(ModelSerializer):
     class Meta:
         model = Banner
-        fields = ['feature_id', 'tag_id', 'use_last_revision']
+        fields = ['title', 'text', 'url']

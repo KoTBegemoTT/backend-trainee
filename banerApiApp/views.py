@@ -4,7 +4,7 @@ from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Banner
-from .serializers import BannerSerializer, UserBannerQuerySerializer
+from .serializers import BannerSerializer, UserBannerSerializer
 
 
 # Create your views here.
@@ -12,26 +12,6 @@ from .serializers import BannerSerializer, UserBannerQuerySerializer
 @api_view(["GET"])
 def index(request):
     return Response({"Success": "The setup was successful"})
-
-
-@api_view(["GET", 'POST'])
-def banner_view(request):
-    """
-    List all banners snippets, or create a new banner.
-    """
-    if request.method == 'GET':
-        banners = Banner.objects.all()
-        serialized_banners = BannerSerializer(banners, many=True)
-        return Response(serialized_banners.data)
-
-    elif request.method == 'POST':
-        data = request.data
-        serializer = BannerSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response("Banner added successfully", status=201)
-        else:
-            return Response(serializer.errors, status=400)
 
 
 @api_view(["GET"])
@@ -44,14 +24,65 @@ def get_banner(request):
         return Response({"error": str(e)}, status=400)
 
     # Todo add use_last_version
+    # Todo add filter IsActive
     try:
         banner = Banner.objects.filter(feature_id=feature_id).get(tag_ids=tag_id)
-        serializer = BannerSerializer(banner)
+        serializer = UserBannerSerializer(banner)
     except Banner.DoesNotExist:
         return Response(status=404)
     except Exception as e:
         return Response({"error": str(e)}, status=500)
     return Response(serializer.data)
+
+
+@api_view(["GET", 'POST'])
+def banner_view(request):
+    """
+    List all banners snippets, or create a new banner.
+    """
+    if request.method == 'GET':
+        try:
+            feature_id = request.query_params.get('feature_id', None)
+            if feature_id is not None:
+                feature_id = int(feature_id)
+            tag_id = request.query_params.get('tag_id', None)
+            if tag_id is not None:
+                tag_id = int(tag_id)
+            limit = request.query_params.get('limit', None)
+            if limit is not None:
+                limit = int(limit)
+            offset = request.query_params.get('offset', None)
+            if offset is not None:
+                offset = int(offset)
+        except Exception as e:
+            return Response({"error": str(e)}, status=400)
+
+        try:
+            banners = Banner.objects.all()
+            if feature_id is not None:
+                banners = banners.filter(feature_id=feature_id)
+            elif tag_id is not None:
+                banners = banners.filter(tag_ids=tag_id)
+
+            if limit is not None:
+                banners = banners[:limit + 1]
+            if offset is not None:
+                banners = banners[offset:]
+
+            serializer = BannerSerializer(banners, many=True)
+            return Response(serializer.data)
+        except Exception as e:
+            return Response({"error": str(e)}, status=500)
+
+
+    elif request.method == 'POST':
+        data = request.data
+        serializer = BannerSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response("Banner added successfully", status=201)
+        else:
+            return Response(serializer.errors, status=400)
 
 
 @api_view(["PATCH", 'DELETE'])
