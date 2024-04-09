@@ -1,15 +1,15 @@
-import rest_framework.serializers
+from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 from .models import Banner
+
+
+class ContentSerializer(serializers.Serializer):
+    title = serializers.CharField()
+    text = serializers.CharField()
+    url = serializers.URLField()
 
 
 class BannerSerializer(ModelSerializer):
     class Meta:
         model = Banner
-        fields = '__all__'
-
-
-class UserBannerSerializer(ModelSerializer):
-    class Meta:
-        model = Banner
-        fields = ['title', 'text', 'url']
+        fields = ['banner_id', 'tag_ids', 'feature_id', 'content', 'is_active', 'created_at', 'updated_at']

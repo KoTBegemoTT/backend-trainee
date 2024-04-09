@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 
     'banerApiApp',
     'rest_framework',
+    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
