@@ -1,4 +1,6 @@
-from rest_framework.decorators import api_view
+from .authentication import CustomTokenAuthentication
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from .models import Banner
 from .serializers import BannerSerializer, ContentSerializer
@@ -11,6 +13,8 @@ def index(request):
 
 
 @api_view(["GET"])
+@authentication_classes([CustomTokenAuthentication])
+@permission_classes([IsAdminUser])
 def get_banner(request):
     try:
         tag_id = int(request.query_params.get('tag_id'))
@@ -67,6 +71,8 @@ def found_banners(feature_id, tag_id, limit, offset):
 
 
 @api_view(["GET", 'POST'])
+@authentication_classes([CustomTokenAuthentication])
+@permission_classes([IsAdminUser])
 def banner_view(request):
     """
     List all banners snippets, or create a new banner.
@@ -103,6 +109,8 @@ def banner_view(request):
 
 
 @api_view(["PATCH", 'DELETE'])
+@authentication_classes([CustomTokenAuthentication])
+@permission_classes([IsAdminUser])
 def update_banner(request, banner_id: str):
     """
     Patch banner or delete by id
