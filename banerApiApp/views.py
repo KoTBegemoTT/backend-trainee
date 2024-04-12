@@ -14,7 +14,7 @@ def index(request):
 
 @api_view(["GET"])
 @authentication_classes([CustomTokenAuthentication])
-@permission_classes([IsAdminUser])
+@permission_classes([IsAuthenticated])
 def get_banner(request):
     try:
         tag_id = int(request.query_params.get('tag_id'))
@@ -86,7 +86,7 @@ def banner_view(request):
         try:
             banners = found_banners(feature_id, tag_id, limit, offset)
             serializer = BannerSerializer(banners, many=True)
-            return Response(serializer.data)
+            return Response(serializer.data, status=200)
         except Exception as e:
             return Response({"error": str(e)}, status=500)
 
