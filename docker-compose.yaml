@@ -9,7 +9,7 @@ services:
             - POSTGRES_PASSWORD=admin
         healthcheck:
             test: ["CMD", "pg_isready", "-U", "admin", "-d", "banner_db"]
-            interval: 10s
+            interval: 5s
 
     django:
         build: .
